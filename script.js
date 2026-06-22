@@ -50,7 +50,9 @@ const material = new THREE.ShaderMaterial({
         uMorph: { value: 0 },
         uTemplate: { value: 0 },
         uExpand: { value: 1.0 },
-        uColorShift: { value: 0.0 }
+        uColorShift: { value: 0.0 },
+        uHandPos: { value: new THREE.Vector3(0, 0, 0) },
+        uHandActive: { value: 0.0 }
     },
     vertexShader: document.getElementById('vertexShader').textContent,
     fragmentShader: document.getElementById('fragmentShader').textContent,
@@ -68,6 +70,40 @@ window.addEventListener('resize', () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
     composer.setSize(window.innerWidth, window.innerHeight);
 });
+
+// UI Controls & Interactive Selectors
+const camToggle = document.getElementById('cam-toggle');
+const videoContainer = document.getElementById('video-container');
+const gestureList = document.getElementById('gesture-list');
+const listItems = gestureList.querySelectorAll('li');
+
+let isCamOpen = false;
+camToggle.addEventListener('click', () => {
+    isCamOpen = !isCamOpen;
+    if (isCamOpen) {
+        videoContainer.classList.add('show');
+        camToggle.classList.add('active');
+    } else {
+        videoContainer.classList.remove('show');
+        camToggle.classList.remove('active');
+    }
+});
+
+function updateActiveUI(templateIdx) {
+    gestureList.classList.add('has-active');
+    listItems.forEach((li, idx) => {
+        if (idx === templateIdx) {
+            li.classList.add('active');
+        } else {
+            li.classList.remove('active');
+        }
+    });
+}
+
+function clearActiveUI() {
+    gestureList.classList.remove('has-active');
+    listItems.forEach(li => li.classList.remove('active'));
+}
 
 let targetTemplate = 0;
 let targetMorph = 0;
@@ -99,6 +135,15 @@ hands.onResults((results) => {
         points.rotation.y = THREE.MathUtils.lerp(points.rotation.y, cx * Math.PI * 3, 0.1);
         points.rotation.x = THREE.MathUtils.lerp(points.rotation.x, cy * Math.PI * 2, 0.1);
         material.uniforms.uColorShift.value += cx * 0.04;
+
+        // Project the index finger tip in local space of points container
+        const hx = landmarks[8].x - 0.5;
+        const hy = landmarks[8].y - 0.5;
+        const worldHand = new THREE.Vector3(-hx * 70, -hy * 50, 0);
+        points.updateMatrixWorld(true);
+        const localHand = worldHand.clone().applyMatrix4(points.matrixWorld.clone().invert());
+        material.uniforms.uHandPos.value.copy(localHand);
+        material.uniforms.uHandActive.value = 1.0;
 
         const wrist = landmarks[0];
 
@@ -137,6 +182,7 @@ hands.onResults((results) => {
         }
 
         material.uniforms.uTemplate.value = targetTemplate;
+        updateActiveUI(targetTemplate);
 
         const dx = landmarks[8].x - landmarks[4].x;
         const dy = landmarks[8].y - landmarks[4].y;
@@ -150,6 +196,8 @@ hands.onResults((results) => {
         statusEl.innerText = "Scanning Area...";
         statusEl.classList.remove('status-active');
         targetMorph = 0.0;
+        material.uniforms.uHandActive.value = 0.0;
+        clearActiveUI();
 
         points.rotation.y += 0.002;
         points.rotation.x += 0.001;

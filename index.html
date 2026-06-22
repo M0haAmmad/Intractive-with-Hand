@@ -9,15 +9,20 @@
 
 <body>
     <div id="ui">
-        <h2>Particle Core</h2>
+        <div class="ui-header">
+            <h2>Particle Core</h2>
+            <button class="cam-btn" id="cam-toggle" title="Toggle Camera Preview">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+            </button>
+        </div>
         <div id="status">Initializing Camera...</div>
-        <ul>
-            <li><span class="dot-0"></span><b>Fist:</b> Nebula / Idle</li>
-            <li><span class="dot-1"></span><b>1 Finger:</b> Heart Shape</li>
-            <li><span class="dot-2"></span><b>2 Fingers:</b> Saturn Rings</li>
-            <li><span class="dot-3"></span><b>3 Fingers:</b> Flower Bloom</li>
-            <li><span class="dot-4"></span><b>4 Fingers:</b> DNA Helix</li>
-            <li><span class="dot-5"></span><b>5 Fingers:</b> Galaxy Spiral</li>
+        <ul id="gesture-list">
+            <li id="item-0" class="gesture-0"><span class="dot-0"></span><b>Fist:</b> Nebula / Idle</li>
+            <li id="item-1" class="gesture-1"><span class="dot-1"></span><b>1 Finger:</b> Heart Shape</li>
+            <li id="item-2" class="gesture-2"><span class="dot-2"></span><b>2 Fingers:</b> Infinity Loop</li>
+            <li id="item-3" class="gesture-3"><span class="dot-3"></span><b>3 Fingers:</b> Flower Bloom</li>
+            <li id="item-4" class="gesture-4"><span class="dot-4"></span><b>4 Fingers:</b> DNA Helix</li>
+            <li id="item-5" class="gesture-5"><span class="dot-5"></span><b>5 Fingers:</b> Butterfly Wings</li>
         </ul>
         <div class="tips">
             ✦ <b>Pinch Index to Thumb:</b> Scale Particles dynamically.<br>
@@ -25,7 +30,9 @@
         </div>
     </div>
 
-    <video autoplay playsinline></video>
+    <div class="video-container" id="video-container">
+        <video autoplay playsinline></video>
+    </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
@@ -44,6 +51,8 @@
         uniform float uTemplate; // 0: Nebula, 1: Heart, 2: Saturn, 3: Flower, 4: DNA, 5: Galaxy
         uniform float uExpand;
         uniform float uColorShift;
+        uniform vec3 uHandPos;
+        uniform float uHandActive;
         attribute vec3 aRandom;
         
         varying vec3 vColor;
@@ -75,17 +84,13 @@
                 targetPos.z = (z - 0.5) * 8.0;
                 targetPos += (vec3(aRandom) - 0.5) * 2.5; // Volumetric noise
             } 
-            // 2. SATURN (Core + Ring)
+            // 2. INFINITY LOOP
             else if(uTemplate == 2.0) {
-                if (z > 0.7) {
-                    float radius = 6.0 * (r + 0.3);
-                    float phi = acos(2.0 * aRandom.x - 1.0);
-                    float theta = aRandom.y * 6.28318;
-                    targetPos = vec3(radius * sin(phi) * cos(theta), radius * sin(phi) * sin(theta), radius * cos(phi));
-                } else {
-                    float dist = 10.0 + r * 18.0;
-                    targetPos = vec3(cos(t)*dist, (z - 0.5)*1.5, sin(t)*dist);
-                }
+                float flowT = t + uTime * 1.5;
+                float scale = 18.0;
+                targetPos.x = sin(flowT) * scale;
+                targetPos.y = sin(flowT) * cos(flowT) * scale;
+                targetPos.z = sin(2.0 * flowT) * 4.0 + (z - 0.5) * 1.5;
             }
             // 3. FLOWER BLOOM
             else if(uTemplate == 3.0) {
@@ -115,22 +120,12 @@
                 }
                 targetPos += (vec3(aRandom) - 0.5) * 0.7; // subtle noise
             }
-            // 5. GALAXY SPIRAL
+            // 5. BUTTERFLY WINGS
             else if(uTemplate == 5.0) {
-                float spiralArms = 4.0;
-                float vRad = aRandom.y * 28.0;
-                float armOffset = floor(aRandom.z * spiralArms) * (6.28318 / spiralArms);
-                float twist = vRad * 0.4; // tightness of the spiral
-                
-                // Exponential core clustering
-                vRad = pow(aRandom.y, 2.0) * 35.0;
-                
-                float finalAngle = armOffset + twist;
-                float dispAngle = finalAngle + (aRandom.x - 0.5) * 2.0;
-                float dispRad = vRad + (aRandom.z - 0.5) * 4.0;
-                
-                float verticalSpread = (aRandom.y - 0.5) * 12.0 * (1.0 - aRandom.y);
-                targetPos = vec3(cos(dispAngle)*dispRad, verticalSpread, sin(dispAngle)*dispRad);
+                float scale = 4.5;
+                targetPos.x = sin(t) * (exp(cos(t)) - 2.0 * cos(4.0 * t)) * scale;
+                targetPos.y = cos(t) * (exp(cos(t)) - 2.0 * cos(4.0 * t)) * scale - 2.0;
+                targetPos.z = (z - 0.5) * 3.0;
             }
 
             // --- ANIMATIONS ---
@@ -142,8 +137,8 @@
                 float beat = 1.0 + 0.15 * sin(uTime * 4.0) * pow(sin(uTime * 4.0), 2.0); // heartbeat thump
                 animPos *= beat;
             } else if (uTemplate == 2.0) {
-                float s = sin(uTime * 0.5); float c = cos(uTime * 0.5);
-                animPos.xz = mat2(c, -s, s, c) * animPos.xz; // Rings rotate
+                float s = sin(uTime * 0.2); float c = cos(uTime * 0.2);
+                animPos.xz = mat2(c, -s, s, c) * animPos.xz; // slow rotation
             } else if (uTemplate == 3.0) {
                 animPos.y += sin(uTime * 2.0 + animPos.x * 0.1) * 1.5; // Flower breathes
             } else if (uTemplate == 4.0) {
@@ -151,14 +146,16 @@
                 float s = sin(uTime); float c = cos(uTime);
                 animPos.xz = mat2(c, -s, s, c) * animPos.xz; // DNA Rotates
             } else if (uTemplate == 5.0) {
-                float dist = length(animPos.xz);
-                float rotSpeed = uTime * (6.0 / (dist + 2.0)); // Core rotates faster
-                float s = sin(rotSpeed); float c = cos(rotSpeed);
-                animPos.xz = mat2(c, -s, s, c) * animPos.xz;
+                float flap = 0.35 + 0.65 * abs(sin(uTime * 4.5));
+                animPos.x *= flap;
+                animPos.z += cos(uTime * 4.5) * (targetPos.x * 0.15); // flap-bend effect
             }
 
             // MORPH & EXPAND
             vec3 finalPos = mix(pos, animPos, uMorph) * uExpand;
+            
+
+
             vec4 mvPosition = modelViewMatrix * vec4(finalPos, 1.0);
             
             // Perspective size 
@@ -190,8 +187,13 @@
             float dist = length(coord);
             if(dist > 0.5) discard;
             
-            // Soft glow falloff
-            float alpha = smoothstep(0.5, 0.0, dist) * vAlpha;
+            // Ultra-smooth radial particle glow (soft look, avoids pixelation)
+            float glow = smoothstep(0.5, 0.0, dist);
+            
+            // Small high-intensity core glow for volumetric sparkle effect
+            float core = smoothstep(0.15, 0.0, dist) * 0.8;
+            
+            float alpha = (glow * 0.6 + core) * vAlpha;
             gl_FragColor = vec4(vColor, alpha);
         }
     </script>

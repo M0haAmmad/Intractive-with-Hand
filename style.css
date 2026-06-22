@@ -1,149 +1,264 @@
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&display=swap');
 
-        body {
-            margin: 0;
-            overflow: hidden;
-            background: radial-gradient(circle at center, #1a1a24 0%, #000000 100%);
-            color: #fff;
-            font-family: 'Outfit', sans-serif;
-            user-select: none;
-        }
+body {
+    margin: 0;
+    overflow: hidden;
+    background: radial-gradient(circle at center, #111118 0%, #000000 100%);
+    color: #fff;
+    font-family: 'Outfit', sans-serif;
+    user-select: none;
+}
 
-        #ui {
-            position: absolute;
-            top: 30px;
-            left: 30px;
-            z-index: 10;
-            pointer-events: none;
-            background: rgba(20, 20, 25, 0.6);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 24px;
-            padding: 25px 30px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
-            max-width: 320px;
-        }
+#ui {
+    position: absolute;
+    top: 30px;
+    left: 30px;
+    z-index: 10;
+    pointer-events: auto; /* Allow clicking on interactive UI elements */
+    background: rgba(10, 10, 15, 0.65);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    padding: 25px 30px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 
+                inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+    max-width: 320px;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
 
-        h2 {
-            margin: 0 0 15px 0;
-            font-size: 26px;
-            font-weight: 700;
-            background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-        }
+.ui-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
 
-        #status {
-            font-size: 14px;
-            font-weight: 500;
-            margin-bottom: 20px;
-            padding: 8px 16px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 30px;
-            display: inline-block;
-            border: 1px solid rgba(79, 172, 254, 0.3);
-            color: #4facfe;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-size: 11px;
-        }
+h2 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
 
-        .status-active {
-            border-color: #00f2fe !important;
-            color: #00f2fe !important;
-            box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
-            background: rgba(0, 242, 254, 0.1) !important;
-        }
+/* Camera Toggle Button */
+.cam-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.6);
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
 
-        ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
+.cam-btn:hover {
+    background: rgba(0, 242, 254, 0.15);
+    border-color: rgba(0, 242, 254, 0.5);
+    color: #00f2fe;
+    box-shadow: 0 0 12px rgba(0, 242, 254, 0.3);
+    transform: scale(1.05);
+}
 
-        li {
-            font-size: 15px;
-            margin-bottom: 14px;
-            display: flex;
-            align-items: center;
-            color: #ccc;
-        }
+.cam-btn.active {
+    background: rgba(0, 242, 254, 0.25);
+    border-color: #00f2fe;
+    color: #fff;
+    box-shadow: 0 0 15px rgba(0, 242, 254, 0.5);
+}
 
-        li b {
-            color: #fff;
-            width: 95px;
-            display: inline-block;
-            font-weight: 500;
-        }
+#status {
+    font-size: 10px;
+    font-weight: 700;
+    margin-bottom: 22px;
+    padding: 6px 14px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 30px;
+    display: inline-block;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.4);
+    transition: all 0.4s ease;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+}
 
-        li span {
-            display: inline-block;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            margin-right: 15px;
-        }
+.status-active {
+    border-color: rgba(0, 242, 254, 0.4) !important;
+    color: #00f2fe !important;
+    box-shadow: 0 0 15px rgba(0, 242, 254, 0.2);
+    background: rgba(0, 242, 254, 0.08) !important;
+}
 
-        /* Shape colors to preview what's going to show up */
-        .dot-0 {
-            background: #ffffff;
-            box-shadow: 0 0 12px #ffffff;
-        }
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    transition: all 0.3s ease;
+}
 
-        .dot-1 {
-            background: #ff3366;
-            box-shadow: 0 0 12px #ff3366;
-        }
+/* Base list item style */
+li {
+    font-size: 14px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    color: rgba(255, 255, 255, 0.4);
+    padding: 10px 14px;
+    border-radius: 14px;
+    border: 1px solid transparent;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
 
-        .dot-2 {
-            background: #ff9933;
-            box-shadow: 0 0 12px #ff9933;
-        }
+li b {
+    color: rgba(255, 255, 255, 0.5);
+    width: 95px;
+    display: inline-block;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
 
-        .dot-3 {
-            background: #33ccff;
-            box-shadow: 0 0 12px #33ccff;
-        }
+li span {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 15px;
+    transition: all 0.3s ease;
+}
 
-        .dot-4 {
-            background: #cc33ff;
-            box-shadow: 0 0 12px #cc33ff;
-        }
+/* Inactive items opacity fade when some gesture is active */
+ul.has-active li:not(.active) {
+    opacity: 0.3;
+}
 
-        .dot-5 {
-            background: #33ff99;
-            box-shadow: 0 0 12px #33ff99;
-        }
+/* Active gesture style rules */
+li.active {
+    color: #fff;
+    transform: scale(1.04) translateX(4px);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
 
-        .tips {
-            margin-top: 25px;
-            font-size: 13px;
-            color: #888;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            padding-top: 20px;
-            line-height: 1.6;
-        }
+li.active b {
+    color: #fff;
+    font-weight: 700;
+}
 
-        .tips b {
-            color: #bbb;
-        }
+li.active.gesture-0 {
+    border-color: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.05), inset 0 0 8px rgba(255, 255, 255, 0.02);
+}
+li.active.gesture-1 {
+    border-color: rgba(255, 51, 102, 0.25);
+    box-shadow: 0 0 15px rgba(255, 51, 102, 0.1), inset 0 0 8px rgba(255, 51, 102, 0.02);
+}
+li.active.gesture-2 {
+    border-color: rgba(255, 153, 51, 0.25);
+    box-shadow: 0 0 15px rgba(255, 153, 51, 0.1), inset 0 0 8px rgba(255, 153, 51, 0.02);
+}
+li.active.gesture-3 {
+    border-color: rgba(51, 204, 255, 0.25);
+    box-shadow: 0 0 15px rgba(51, 204, 255, 0.1), inset 0 0 8px rgba(51, 204, 255, 0.02);
+}
+li.active.gesture-4 {
+    border-color: rgba(204, 51, 255, 0.25);
+    box-shadow: 0 0 15px rgba(204, 51, 255, 0.1), inset 0 0 8px rgba(204, 51, 255, 0.02);
+}
+li.active.gesture-5 {
+    border-color: rgba(51, 255, 153, 0.25);
+    box-shadow: 0 0 15px rgba(51, 255, 153, 0.1), inset 0 0 8px rgba(51, 255, 153, 0.02);
+}
 
-        canvas {
-            display: block;
-        }
+/* Dots and active dot scale glows */
+.dot-0 { background: #ffffff; box-shadow: 0 0 10px #ffffff; }
+.dot-1 { background: #ff3366; box-shadow: 0 0 10px #ff3366; }
+.dot-2 { background: #ff9933; box-shadow: 0 0 10px #ff9933; }
+.dot-3 { background: #33ccff; box-shadow: 0 0 10px #33ccff; }
+.dot-4 { background: #cc33ff; box-shadow: 0 0 10px #cc33ff; }
+.dot-5 { background: #33ff99; box-shadow: 0 0 10px #33ff99; }
 
-        video {
-            display: none;
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            width: 200px;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-            /* Uncomment display below if you want to see the video feed */
-            /* display: block; */
-        }
+li.active.gesture-0 .dot-0 { transform: scale(1.4); box-shadow: 0 0 15px #ffffff; }
+li.active.gesture-1 .dot-1 { transform: scale(1.4); box-shadow: 0 0 15px #ff3366; }
+li.active.gesture-2 .dot-2 { transform: scale(1.4); box-shadow: 0 0 15px #ff9933; }
+li.active.gesture-3 .dot-3 { transform: scale(1.4); box-shadow: 0 0 15px #33ccff; }
+li.active.gesture-4 .dot-4 { transform: scale(1.4); box-shadow: 0 0 15px #cc33ff; }
+li.active.gesture-5 .dot-5 { transform: scale(1.4); box-shadow: 0 0 15px #33ff99; }
+
+.tips {
+    margin-top: 20px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.3);
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    padding-top: 18px;
+    line-height: 1.6;
+}
+
+.tips b {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+canvas {
+    display: block;
+}
+
+/* Futuristic Picture-in-Picture Webcam Container */
+.video-container {
+    position: absolute;
+    bottom: 30px;
+    right: 30px;
+    width: 180px;
+    height: 135px;
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid rgba(0, 242, 254, 0.25);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 
+                0 0 20px rgba(0, 242, 254, 0.1);
+    background: #000;
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: scale(0);
+    opacity: 0;
+    transform-origin: bottom right;
+    pointer-events: none;
+}
+
+.video-container.show {
+    transform: scale(1);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.video-container video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scaleX(-1); /* Mirror camera feed for natural interaction */
+}
+
+/* Sci-fi Overlay laser scanline */
+.video-container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(180deg, rgba(0, 242, 254, 0) 0%, rgba(0, 242, 254, 0.8) 50%, rgba(0, 242, 254, 0) 100%);
+    box-shadow: 0 0 10px rgba(0, 242, 254, 0.5);
+    animation: scanner 2.5s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes scanner {
+    0% { top: 0%; }
+    50% { top: 100%; }
+    100% { top: 0%; }
+}
